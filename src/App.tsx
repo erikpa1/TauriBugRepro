@@ -2,10 +2,9 @@ import React from 'react'
 
 import './App.css'
 
-
 import FsTools from "@api/FsTools";
 import TauriOsPlugin from "./tauri/plugin_os";
-import TauriProjectPlugin from "./tauri/plugin_project";
+
 
 export default function App() {
 
@@ -16,15 +15,13 @@ export default function App() {
 
         FsTools.WORK_DIR = await TauriOsPlugin.GetWorkingDirectory()
 
-        await TauriProjectPlugin.ActivateLastProject()
 
     }
-
 
     React.useEffect(() => {
         setIsLoading(true)
 
-        init.then(() => {
+        init().then(() => {
             setIsLoading(false)
 
         })
@@ -41,8 +38,8 @@ export default function App() {
 
         return (
             <div>
-
                 <_Working/>
+                <_NotWokrking/>
             </div>
 
         )
@@ -52,9 +49,15 @@ export default function App() {
 
 
 function _Working() {
+
+    const PATH = FsTools.GetPlatformPath("ShouldBeWorking.jpg")
+
+    //TODO THIS SHOULD WORK TOO!!! this is only mechanism how to force refresh of some image from cache
+    const NOT_WORKING_PATH = `${PATH}?random=${Math.random()}`
+
     return (
         <img
-            src={FsTools.GetPlatformPath("ShouldBeWorking.jpg")}
+            src={FsTools.ConvertFilePath(PATH)}
             style={{height: "150px", width: "300px"}}
         />
     )
@@ -62,21 +65,48 @@ function _Working() {
 
 function _NotWokrking() {
 
-    const [pathVal, setPathVal] = React.useState({})
+    const TO_BE_COPIED = FsTools.GetPlatformPath("ToBeCopied.jpg")
+    const TARGET = FsTools.GetPlatformPath("Target.jpg")
+
+    const [pathVal, setPathVal] = React.useState({path: TARGET})
+
+    const [wasRerfreshedOnce, setWasRefreshedOnce] = React.useState(false)
 
     function copyClicked() {
-        TauriOsPlugin.CopyFile(FsTools.GetPlatformPath("ToBeCopied.jpg"), FsTools.GetPlatformPath("Target.jpg"))
+        TauriOsPlugin.CopyFile(TO_BE_COPIED, TARGET).then(() => {
+            console.log("File copied")
+            setPathVal({path: TARGET})
+
+        })
+
     }
+
+    function refresh() {
+
+        if (wasRerfreshedOnce) {
+            setPathVal({path: FsTools.GetPlatformPath("ShouldBeWorking1.jpg")})
+        } else {
+            setPathVal({path: FsTools.GetPlatformPath("Target.jpg")})
+        }
+
+
+        setWasRefreshedOnce(!wasRerfreshedOnce)
+
+    }
+
+
+    console.log("Refreshing")
 
 
     return (
         <div>
 
             <button onClick={copyClicked}>Copy</button>
+            <button onClick={refresh}>Refresh</button>
 
 
             <img
-                src={FsTools.GetPlatformPath("Target.jpg")}
+                src={FsTools.ConvertFilePath(pathVal.path)}
                 style={{height: "150px", width: "300px"}}
             />
         </div>

@@ -20,44 +20,8 @@ export default class FsTools {
     }
 
     static GetPlatformPath(path: string) {
-        return FsTools.NormalizePath(`${FsTools.WORK_DIR}/${path}`)
+        return FsTools.NormalizePath(`${FsTools.WORK_DIR}${path}`)
     }
 
-    static GetProjectsPath(path: string) {
-        return FsTools.NormalizePath(`${FsTools.WORK_DIR}projects/${path}`)
-    }
-
-    static GetPathInProject(projectUid: string, path: string) {
-        return FsTools.GetProjectsPath(`${projectUid}/${path}`)
-    }
-
-
-    static GetFileExtension(name: string): string {
-        return name.split(".").pop() as string
-    }
-
-
-    static ReplaceFileExtention(filePath: string, newExtension: string): string {
-        const paths = filePath.split(".")
-
-        paths[paths.length - 1] = newExtension
-
-        const finalPath = paths.join(".")
-
-        return finalPath
-    }
-
-    static ReplaceFileNameAndExtension(filePath: string, newFileName: string): string {
-        const paths = filePath.split(sep)
-        paths[paths.length - 1] = newFileName
-        const finalPath = paths.join(sep)
-        return finalPath
-    }
-
-    static GetFileNameAndExtension(filePath: string): string {
-        const paths = filePath.split(sep)
-
-        return paths[paths.length - 1]
-    }
 
 }
